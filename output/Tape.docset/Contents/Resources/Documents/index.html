@@ -1,0 +1,286 @@
+
+            <html>
+                <head>
+                    <title>Tape</title>
+                    <link rel="stylesheet" type="text/css" href="github.css">
+                </head>
+
+                <body>
+                    
+            <html>
+                <head>
+                    <title>Tape</title>
+                    <link rel="stylesheet" type="text/css" href="github.css">
+                </head>
+
+                <body>
+                    <h1><a id="tape_0" class="dashAnchor" name="//apple_ref/Module/tape"></a>tape</h1>
+<p>tap-producing test harness for node and browsers</p>
+<p><a href="http://ci.testling.com/substack/tape"><img src="https://ci.testling.com/substack/tape.png" alt="browser support"></a></p>
+<p><a href="http://travis-ci.org/substack/tape"><img src="https://secure.travis-ci.org/substack/tape.png" alt="build status"></a></p>
+<p><img src="http://substack.net/images/tape_drive.png" alt="tape"></p>
+<h1><a id="example_10" class="dashAnchor" name="//apple_ref/Module/example"></a>example</h1>
+<pre><code class="hljs language-js"><span class="hljs-keyword">var</span> test = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;tape&apos;</span>);
+
+test(<span class="hljs-string">&apos;timing test&apos;</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">t</span>) </span>{
+    t.plan(<span class="hljs-number">2</span>);
+    
+    t.equal(<span class="hljs-keyword">typeof</span> <span class="hljs-built_in">Date</span>.now, <span class="hljs-string">&apos;function&apos;</span>);
+    <span class="hljs-keyword">var</span> start = <span class="hljs-built_in">Date</span>.now();
+    
+    setTimeout(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+        t.equal(<span class="hljs-built_in">Date</span>.now() - start, <span class="hljs-number">100</span>);
+    }, <span class="hljs-number">100</span>);
+});
+</code></pre>
+<pre><code class="hljs">$ node example/timing.js
+TAP version <span class="hljs-number">13</span>
+<span class="hljs-preprocessor"># timing test</span>
+ok <span class="hljs-number">1</span> should be equal
+not ok <span class="hljs-number">2</span> should be equal
+  ---
+    <span class="hljs-keyword">operator</span>: equal
+    expected: <span class="hljs-number">100</span>
+    actual:   <span class="hljs-number">107</span>
+  ...
+
+<span class="hljs-number">1.</span><span class="hljs-number">.2</span>
+<span class="hljs-preprocessor"># tests <span class="hljs-number">2</span></span>
+<span class="hljs-preprocessor"># pass  <span class="hljs-number">1</span></span>
+<span class="hljs-preprocessor"># fail  <span class="hljs-number">1</span></span>
+</code></pre>
+<h1><a id="usage_45" class="dashAnchor" name="//apple_ref/Module/usage"></a>usage</h1>
+<p>You always need to <code>require(&apos;tape&apos;)</code> in test files. You can run the tests by
+usual node means (<code>require(&apos;test-file.js&apos;)</code> or <code>node test-file.js</code>). You can
+also run tests using the <code>tape</code> binary to utilize globbing, on Windows for
+example:</p>
+<pre><code class="hljs language-sh">$ tape tests/**/*.js
+</code></pre>
+<p><code>tape</code>&apos;s arguments are passed to the
+<a href="https://www.npmjs.com/package/glob"><code>glob</code></a> module. If you want <code>glob</code> to
+perform the expansion on a system where the shell performs such expansion, quote
+the arguments as necessary:</p>
+<pre><code class="hljs language-sh">$ tape <span class="hljs-string">&apos;tests/**/*.js&apos;</span>
+$ tape <span class="hljs-string">&quot;tests/**/*.js&quot;</span>
+</code></pre>
+<h2><a id="Preloading_modules_66" class="dashAnchor" name="//apple_ref/Module/Preloading%20modules"></a>Preloading modules</h2>
+<p>Additionally, it is possible to make <code>tape</code> load one or more modules before running any tests, by using the <code>-r</code> or <code>--require</code> flag. Here&#x2019;s an example that loads <a href="http://babeljs.io/docs/usage/require/">babel-register</a> before running any tests, to allow for JIT compilation:</p>
+<pre><code class="hljs language-sh">$ tape -r babel-register tests/**/*.js
+</code></pre>
+<p>Depending on the module you&#x2019;re loading, you may be able to paramaterize it using environment variables or auxiliary files. Babel, for instance, will load options from <a href="http://babeljs.io/docs/usage/babelrc/"><code>.babelrc</code></a> at runtime.</p>
+<p>The <code>-r</code> flag behaves exactly like node&#x2019;s <code>require</code>, and uses the same module resolution algorithm. This means that if you need to load local modules, you have to prepend their path with <code>./</code> or <code>../</code> accordingly.</p>
+<p>For example:</p>
+<pre><code class="hljs language-sh">$ tape -r ./my/<span class="hljs-built_in">local</span>/module tests/**/*.js
+</code></pre>
+<p>Please note that all modules loaded using the <code>-r</code> flag will run <em>before</em> any tests, regardless of when they are specified. For example, <code>tape -r a b -r c</code> will actually load <code>a</code> and <code>c</code> *before<code>loading</code>b`, since they are flagged as required modules.</p>
+<h1><a id="things_that_go_well_with_tape_86" class="dashAnchor" name="//apple_ref/Module/things%20that%20go%20well%20with%20tape"></a>things that go well with tape</h1>
+<p>tape maintains a fairly minimal core. Additional features are usually added by using another module alongside tape.</p>
+<h2><a id="pretty_reporters_90" class="dashAnchor" name="//apple_ref/Module/pretty%20reporters"></a>pretty reporters</h2>
+<p>The default TAP output is good for machines and humans that are robots.</p>
+<p>If you want a more colorful / pretty output there are lots of modules on npm
+that will output something pretty if you pipe TAP into them:</p>
+<ul>
+<li><a href="https://github.com/scottcorgan/tap-spec">https://github.com/scottcorgan/tap-spec</a></li>
+<li><a href="https://github.com/scottcorgan/tap-dot">https://github.com/scottcorgan/tap-dot</a></li>
+<li><a href="https://github.com/substack/faucet">https://github.com/substack/faucet</a></li>
+<li><a href="https://github.com/juliangruber/tap-bail">https://github.com/juliangruber/tap-bail</a></li>
+<li><a href="https://github.com/kirbysayshi/tap-browser-color">https://github.com/kirbysayshi/tap-browser-color</a></li>
+<li><a href="https://github.com/gummesson/tap-json">https://github.com/gummesson/tap-json</a></li>
+<li><a href="https://github.com/gummesson/tap-min">https://github.com/gummesson/tap-min</a></li>
+<li><a href="https://github.com/calvinmetcalf/tap-nyan">https://github.com/calvinmetcalf/tap-nyan</a></li>
+<li><a href="https://www.npmjs.org/package/tap-pessimist">https://www.npmjs.org/package/tap-pessimist</a></li>
+<li><a href="https://github.com/toolness/tap-prettify">https://github.com/toolness/tap-prettify</a></li>
+<li><a href="https://github.com/shuhei/colortape">https://github.com/shuhei/colortape</a></li>
+<li><a href="https://github.com/aghassemi/tap-xunit">https://github.com/aghassemi/tap-xunit</a></li>
+<li><a href="https://github.com/namuol/tap-difflet">https://github.com/namuol/tap-difflet</a></li>
+<li><a href="https://github.com/gritzko/tape-dom">https://github.com/gritzko/tape-dom</a></li>
+<li><a href="https://github.com/axross/tap-diff">https://github.com/axross/tap-diff</a></li>
+<li><a href="https://github.com/axross/tap-notify">https://github.com/axross/tap-notify</a></li>
+</ul>
+<p>To use them, try <code>node test/index.js | tap-spec</code> or pipe it into one
+of the modules of your choice!</p>
+<h2><a id="uncaught_exceptions_117" class="dashAnchor" name="//apple_ref/Module/uncaught%20exceptions"></a>uncaught exceptions</h2>
+<p>By default, uncaught exceptions in your tests will not be intercepted, and will cause tape to crash. If you find this behavior undesirable, use <a href="https://github.com/michaelrhodes/tape-catch">tape-catch</a> to report any exceptions as TAP errors.</p>
+<h2><a id="other_121" class="dashAnchor" name="//apple_ref/Module/other"></a>other</h2>
+<ul>
+<li>CoffeeScript support with <a href="https://www.npmjs.com/package/coffeetape">https://www.npmjs.com/package/coffeetape</a></li>
+<li>Promise support with <a href="https://www.npmjs.com/package/blue-tape">https://www.npmjs.com/package/blue-tape</a></li>
+<li>ES6 support with <a href="https://www.npmjs.com/package/babel-tape-runner">https://www.npmjs.com/package/babel-tape-runner</a></li>
+</ul>
+<h1><a id="methods_127" class="dashAnchor" name="//apple_ref/Module/methods"></a>methods</h1>
+<p>The assertion methods in tape are heavily influenced or copied from the methods
+in <a href="https://github.com/isaacs/node-tap">node-tap</a>.</p>
+<pre><code class="hljs"><span class="hljs-tag">var</span> test = <span class="hljs-function"><span class="hljs-title">require</span><span class="hljs-params">(<span class="hljs-string">&apos;tape&apos;</span>)</span></span>
+</code></pre>
+<h2><a id="testname_opts_cb_136" class="dashAnchor" name="//apple_ref/Module/test(%5Bname%5D%2C%20%5Bopts%5D%2C%20cb)"></a>test([name], [opts], cb)</h2>
+<p>Create a new test with an optional <code>name</code> string and optional <code>opts</code> object.
+<code>cb(t)</code> fires with the new test object <code>t</code> once all preceeding tests have
+finished. Tests execute serially.</p>
+<p>Available <code>opts</code> options are:</p>
+<ul>
+<li>opts.skip = true/false. See test.skip.</li>
+<li>opts.timeout = 500. Set a timeout for the test, after which it will fail.
+See test.timeoutAfter.</li>
+</ul>
+<p>If you forget to <code>t.plan()</code> out how many assertions you are going to run and you
+don&#x2019;t call <code>t.end()</code> explicitly, your test will hang.</p>
+<h2><a id="testskipname_cb_150" class="dashAnchor" name="//apple_ref/Module/test.skip(name%2C%20cb)"></a>test.skip(name, cb)</h2>
+<p>Generate a new test that will be skipped over.</p>
+<h2><a id="testonFinishfn_154" class="dashAnchor" name="//apple_ref/Module/test.onFinish(fn)"></a>test.onFinish(fn)</h2>
+<p>The onFinish hook will get invoked when ALL tape tests have finished
+right before tape is about to print the test summary.</p>
+<h2><a id="tplann_159" class="dashAnchor" name="//apple_ref/Module/t.plan(n)"></a>t.plan(n)</h2>
+<p>Declare that <code>n</code> assertions should be run. <code>t.end()</code> will be called
+automatically after the <code>n</code>th assertion. If there are any more assertions after
+the <code>n</code>th, or after <code>t.end()</code> is called, they will generate errors.</p>
+<h2><a id="tenderr_165" class="dashAnchor" name="//apple_ref/Module/t.end(err)"></a>t.end(err)</h2>
+<p>Declare the end of a test explicitly. If <code>err</code> is passed in <code>t.end</code> will assert
+that it is falsey.</p>
+<h2><a id="tfailmsg_170" class="dashAnchor" name="//apple_ref/Module/t.fail(msg)"></a>t.fail(msg)</h2>
+<p>Generate a failing assertion with a message <code>msg</code>.</p>
+<h2><a id="tpassmsg_174" class="dashAnchor" name="//apple_ref/Module/t.pass(msg)"></a>t.pass(msg)</h2>
+<p>Generate a passing assertion with a message <code>msg</code>.</p>
+<h2><a id="ttimeoutAfterms_178" class="dashAnchor" name="//apple_ref/Module/t.timeoutAfter(ms)"></a>t.timeoutAfter(ms)</h2>
+<p>Automatically timeout the test after X ms.</p>
+<h2><a id="tskipmsg_182" class="dashAnchor" name="//apple_ref/Module/t.skip(msg)"></a>t.skip(msg)</h2>
+<p>Generate an assertion that will be skipped over.</p>
+<h2><a id="tokvalue_msg_186" class="dashAnchor" name="//apple_ref/Module/t.ok(value%2C%20msg)"></a>t.ok(value, msg)</h2>
+<p>Assert that <code>value</code> is truthy with an optional description message <code>msg</code>.</p>
+<p>Aliases: <code>t.true()</code>, <code>t.assert()</code></p>
+<h2><a id="tnotOkvalue_msg_192" class="dashAnchor" name="//apple_ref/Module/t.notOk(value%2C%20msg)"></a>t.notOk(value, msg)</h2>
+<p>Assert that <code>value</code> is falsy with an optional description message <code>msg</code>.</p>
+<p>Aliases: <code>t.false()</code>, <code>t.notok()</code></p>
+<h2><a id="terrorerr_msg_198" class="dashAnchor" name="//apple_ref/Module/t.error(err%2C%20msg)"></a>t.error(err, msg)</h2>
+<p>Assert that <code>err</code> is falsy. If <code>err</code> is non-falsy, use its <code>err.message</code> as the
+description message.</p>
+<p>Aliases: <code>t.ifError()</code>, <code>t.ifErr()</code>, <code>t.iferror()</code></p>
+<h2><a id="tequalactual_expected_msg_205" class="dashAnchor" name="//apple_ref/Module/t.equal(actual%2C%20expected%2C%20msg)"></a>t.equal(actual, expected, msg)</h2>
+<p>Assert that <code>actual === expected</code> with an optional description <code>msg</code>.</p>
+<p>Aliases: <code>t.equals()</code>, <code>t.isEqual()</code>, <code>t.is()</code>, <code>t.strictEqual()</code>,
+<code>t.strictEquals()</code></p>
+<h2><a id="tnotEqualactual_expected_msg_212" class="dashAnchor" name="//apple_ref/Module/t.notEqual(actual%2C%20expected%2C%20msg)"></a>t.notEqual(actual, expected, msg)</h2>
+<p>Assert that <code>actual !== expected</code> with an optional description <code>msg</code>.</p>
+<p>Aliases: <code>t.notEquals()</code>, <code>t.notStrictEqual()</code>, <code>t.notStrictEquals()</code>,
+<code>t.isNotEqual()</code>, <code>t.isNot()</code>, <code>t.not()</code>, <code>t.doesNotEqual()</code>, <code>t.isInequal()</code></p>
+<h2><a id="tdeepEqualactual_expected_msg_219" class="dashAnchor" name="//apple_ref/Module/t.deepEqual(actual%2C%20expected%2C%20msg)"></a>t.deepEqual(actual, expected, msg)</h2>
+<p>Assert that <code>actual</code> and <code>expected</code> have the same structure and nested values using
+<a href="https://github.com/substack/node-deep-equal">node&#x2019;s deepEqual() algorithm</a>
+with strict comparisons (<code>===</code>) on leaf nodes and an optional description
+<code>msg</code>.</p>
+<p>Aliases: <code>t.deepEquals()</code>, <code>t.isEquivalent()</code>, <code>t.same()</code></p>
+<h2><a id="tnotDeepEqualactual_expected_msg_228" class="dashAnchor" name="//apple_ref/Module/t.notDeepEqual(actual%2C%20expected%2C%20msg)"></a>t.notDeepEqual(actual, expected, msg)</h2>
+<p>Assert that <code>actual</code> and <code>expected</code> do not have the same structure and nested values using
+<a href="https://github.com/substack/node-deep-equal">node&#x2019;s deepEqual() algorithm</a>
+with strict comparisons (<code>===</code>) on leaf nodes and an optional description
+<code>msg</code>.</p>
+<p>Aliases: <code>t.notEquivalent()</code>, <code>t.notDeeply()</code>, <code>t.notSame()</code>,
+<code>t.isNotDeepEqual()</code>, <code>t.isNotDeeply()</code>, <code>t.isNotEquivalent()</code>,
+<code>t.isInequivalent()</code></p>
+<h2><a id="tdeepLooseEqualactual_expected_msg_239" class="dashAnchor" name="//apple_ref/Module/t.deepLooseEqual(actual%2C%20expected%2C%20msg)"></a>t.deepLooseEqual(actual, expected, msg)</h2>
+<p>Assert that <code>actual</code> and <code>expected</code> have the same structure and nested values using
+<a href="https://github.com/substack/node-deep-equal">node&#x2019;s deepEqual() algorithm</a>
+with loose comparisons (<code>==</code>) on leaf nodes and an optional description <code>msg</code>.</p>
+<p>Aliases: <code>t.looseEqual()</code>, <code>t.looseEquals()</code></p>
+<h2><a id="tnotDeepLooseEqualactual_expected_msg_247" class="dashAnchor" name="//apple_ref/Module/t.notDeepLooseEqual(actual%2C%20expected%2C%20msg)"></a>t.notDeepLooseEqual(actual, expected, msg)</h2>
+<p>Assert that <code>actual</code> and <code>expected</code> do not have the same structure and nested values using
+<a href="https://github.com/substack/node-deep-equal">node&#x2019;s deepEqual() algorithm</a>
+with loose comparisons (<code>==</code>) on leaf nodes and an optional description <code>msg</code>.</p>
+<p>Aliases: <code>t.notLooseEqual()</code>, <code>t.notLooseEquals()</code></p>
+<h2><a id="tthrowsfn_expected_msg_255" class="dashAnchor" name="//apple_ref/Module/t.throws(fn%2C%20expected%2C%20msg)"></a>t.throws(fn, expected, msg)</h2>
+<p>Assert that the function call <code>fn()</code> throws an exception. <code>expected</code>, if present, must be a <code>RegExp</code> or <code>Function</code>.</p>
+<h2><a id="tdoesNotThrowfn_expected_msg_259" class="dashAnchor" name="//apple_ref/Module/t.doesNotThrow(fn%2C%20expected%2C%20msg)"></a>t.doesNotThrow(fn, expected, msg)</h2>
+<p>Assert that the function call <code>fn()</code> does not throw an exception.</p>
+<h2><a id="ttestname_cb_263" class="dashAnchor" name="//apple_ref/Module/t.test(name%2C%20cb)"></a>t.test(name, cb)</h2>
+<p>Create a subtest with a new test handle <code>st</code> from <code>cb(st)</code> inside the current
+test <code>t</code>. <code>cb(st)</code> will only fire when <code>t</code> finishes. Additional tests queued up
+after <code>t</code> will not be run until all subtests finish.</p>
+<h2><a id="tcommentmessage_269" class="dashAnchor" name="//apple_ref/Module/t.comment(message)"></a>t.comment(message)</h2>
+<p>Print a message without breaking the tap output. (Useful when using e.g. <code>tap-colorize</code> where output is buffered &amp; <code>console.log</code> will print in incorrect order vis-a-vis tap output.)</p>
+<h2><a id="var_htest__testcreateHarness_273" class="dashAnchor" name="//apple_ref/Module/var%20htest%20%3D%20test.createHarness()"></a>var htest = test.createHarness()</h2>
+<p>Create a new test harness instance, which is a function like <code>test()</code>, but with
+a new pending stack and test state.</p>
+<p>By default the TAP output goes to <code>console.log()</code>. You can pipe the output to
+someplace else if you <code>htest.createStream().pipe()</code> to a destination stream on
+the first tick.</p>
+<h2><a id="testonlyname_cb_282" class="dashAnchor" name="//apple_ref/Module/test.only(name%2C%20cb)"></a>test.only(name, cb)</h2>
+<p>Like <code>test(name, cb)</code> except if you use <code>.only</code> this is the only test case
+that will run for the entire process, all other test cases using tape will
+be ignored</p>
+<h2><a id="var_stream__testcreateStreamopts_288" class="dashAnchor" name="//apple_ref/Module/var%20stream%20%3D%20test.createStream(opts)"></a>var stream = test.createStream(opts)</h2>
+<p>Create a stream of output, bypassing the default output stream that writes
+messages to <code>console.log()</code>. By default <code>stream</code> will be a text stream of TAP
+output, but you can get an object stream instead by setting <code>opts.objectMode</code> to
+<code>true</code>.</p>
+<h3><a id="tap_stream_reporter_295" class="dashAnchor" name="//apple_ref/Module/tap%20stream%20reporter"></a>tap stream reporter</h3>
+<p>You can create your own custom test reporter using this <code>createStream()</code> api:</p>
+<pre><code class="hljs language-js"><span class="hljs-keyword">var</span> test = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;tape&apos;</span>);
+<span class="hljs-keyword">var</span> path = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;path&apos;</span>);
+
+test.createStream().pipe(process.stdout);
+
+process.argv.slice(<span class="hljs-number">2</span>).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">file</span>) </span>{
+    <span class="hljs-built_in">require</span>(path.resolve(file));
+});
+</code></pre>
+<p>You could substitute <code>process.stdout</code> for whatever other output stream you want,
+like a network connection or a file.</p>
+<p>Pass in test files to run as arguments:</p>
+<pre><code class="hljs">$ node tap.js test/x.js test/y.js
+TAP version <span class="hljs-number">13</span>
+<span class="hljs-preprocessor"># (anonymous)</span>
+not ok <span class="hljs-number">1</span> should be equal
+  ---
+    <span class="hljs-keyword">operator</span>: equal
+    expected: <span class="hljs-string">&quot;boop&quot;</span>
+    actual:   <span class="hljs-string">&quot;beep&quot;</span>
+  ...
+<span class="hljs-preprocessor"># (anonymous)</span>
+ok <span class="hljs-number">2</span> should be equal
+ok <span class="hljs-number">3</span> (unnamed assert)
+<span class="hljs-preprocessor"># wheee</span>
+ok <span class="hljs-number">4</span> (unnamed assert)
+
+<span class="hljs-number">1.</span><span class="hljs-number">.4</span>
+<span class="hljs-preprocessor"># tests <span class="hljs-number">4</span></span>
+<span class="hljs-preprocessor"># pass  <span class="hljs-number">3</span></span>
+<span class="hljs-preprocessor"># fail  <span class="hljs-number">1</span></span>
+</code></pre>
+<h3><a id="object_stream_reporter_337" class="dashAnchor" name="//apple_ref/Module/object%20stream%20reporter"></a>object stream reporter</h3>
+<p>Here&#x2019;s how you can render an object stream instead of TAP:</p>
+<pre><code class="hljs language-js"><span class="hljs-keyword">var</span> test = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;tape&apos;</span>);
+<span class="hljs-keyword">var</span> path = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;path&apos;</span>);
+
+test.createStream({ objectMode: <span class="hljs-literal">true</span> }).on(<span class="hljs-string">&apos;data&apos;</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">row</span>) </span>{
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-built_in">JSON</span>.stringify(row))
+});
+
+process.argv.slice(<span class="hljs-number">2</span>).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">file</span>) </span>{
+    <span class="hljs-built_in">require</span>(path.resolve(file));
+});
+</code></pre>
+<p>The output for this runner is:</p>
+<pre><code class="hljs">$ node object.js test/x.js test/y.js
+{<span class="hljs-string">&quot;type&quot;</span>:<span class="hljs-string">&quot;test&quot;</span>,<span class="hljs-string">&quot;name&quot;</span>:<span class="hljs-string">&quot;(anonymous)&quot;</span>,<span class="hljs-string">&quot;id&quot;</span>:<span class="hljs-number">0</span>}
+{<span class="hljs-string">&quot;id&quot;</span>:<span class="hljs-number">0</span>,<span class="hljs-string">&quot;ok&quot;</span>:<span class="hljs-literal">false</span>,<span class="hljs-string">&quot;name&quot;</span>:<span class="hljs-string">&quot;should be equal&quot;</span>,<span class="hljs-string">&quot;operator&quot;</span>:<span class="hljs-string">&quot;equal&quot;</span>,<span class="hljs-string">&quot;actual&quot;</span>:<span class="hljs-string">&quot;beep&quot;</span>,<span class="hljs-string">&quot;expected&quot;</span>:<span class="hljs-string">&quot;boop&quot;</span>,<span class="hljs-string">&quot;error&quot;</span>:{},<span class="hljs-string">&quot;test&quot;</span>:<span class="hljs-number">0</span>,<span class="hljs-string">&quot;type&quot;</span>:<span class="hljs-string">&quot;assert&quot;</span>}
+{<span class="hljs-string">&quot;type&quot;</span>:<span class="hljs-string">&quot;end&quot;</span>,<span class="hljs-string">&quot;test&quot;</span>:<span class="hljs-number">0</span>}
+{<span class="hljs-string">&quot;type&quot;</span>:<span class="hljs-string">&quot;test&quot;</span>,<span class="hljs-string">&quot;name&quot;</span>:<span class="hljs-string">&quot;(anonymous)&quot;</span>,<span class="hljs-string">&quot;id&quot;</span>:<span class="hljs-number">1</span>}
+{<span class="hljs-string">&quot;id&quot;</span>:<span class="hljs-number">0</span>,<span class="hljs-string">&quot;ok&quot;</span>:<span class="hljs-literal">true</span>,<span class="hljs-string">&quot;name&quot;</span>:<span class="hljs-string">&quot;should be equal&quot;</span>,<span class="hljs-string">&quot;operator&quot;</span>:<span class="hljs-string">&quot;equal&quot;</span>,<span class="hljs-string">&quot;actual&quot;</span>:<span class="hljs-number">2</span>,<span class="hljs-string">&quot;expected&quot;</span>:<span class="hljs-number">2</span>,<span class="hljs-string">&quot;test&quot;</span>:<span class="hljs-number">1</span>,<span class="hljs-string">&quot;type&quot;</span>:<span class="hljs-string">&quot;assert&quot;</span>}
+{<span class="hljs-string">&quot;id&quot;</span>:<span class="hljs-number">1</span>,<span class="hljs-string">&quot;ok&quot;</span>:<span class="hljs-literal">true</span>,<span class="hljs-string">&quot;name&quot;</span>:<span class="hljs-string">&quot;(unnamed assert)&quot;</span>,<span class="hljs-string">&quot;operator&quot;</span>:<span class="hljs-string">&quot;ok&quot;</span>,<span class="hljs-string">&quot;actual&quot;</span>:<span class="hljs-literal">true</span>,<span class="hljs-string">&quot;expected&quot;</span>:<span class="hljs-literal">true</span>,<span class="hljs-string">&quot;test&quot;</span>:<span class="hljs-number">1</span>,<span class="hljs-string">&quot;type&quot;</span>:<span class="hljs-string">&quot;assert&quot;</span>}
+{<span class="hljs-string">&quot;type&quot;</span>:<span class="hljs-string">&quot;end&quot;</span>,<span class="hljs-string">&quot;test&quot;</span>:<span class="hljs-number">1</span>}
+{<span class="hljs-string">&quot;type&quot;</span>:<span class="hljs-string">&quot;test&quot;</span>,<span class="hljs-string">&quot;name&quot;</span>:<span class="hljs-string">&quot;wheee&quot;</span>,<span class="hljs-string">&quot;id&quot;</span>:<span class="hljs-number">2</span>}
+{<span class="hljs-string">&quot;id&quot;</span>:<span class="hljs-number">0</span>,<span class="hljs-string">&quot;ok&quot;</span>:<span class="hljs-literal">true</span>,<span class="hljs-string">&quot;name&quot;</span>:<span class="hljs-string">&quot;(unnamed assert)&quot;</span>,<span class="hljs-string">&quot;operator&quot;</span>:<span class="hljs-string">&quot;ok&quot;</span>,<span class="hljs-string">&quot;actual&quot;</span>:<span class="hljs-literal">true</span>,<span class="hljs-string">&quot;expected&quot;</span>:<span class="hljs-literal">true</span>,<span class="hljs-string">&quot;test&quot;</span>:<span class="hljs-number">2</span>,<span class="hljs-string">&quot;type&quot;</span>:<span class="hljs-string">&quot;assert&quot;</span>}
+{<span class="hljs-string">&quot;type&quot;</span>:<span class="hljs-string">&quot;end&quot;</span>,<span class="hljs-string">&quot;test&quot;</span>:<span class="hljs-number">2</span>}
+</code></pre>
+<h1><a id="install_370" class="dashAnchor" name="//apple_ref/Module/install"></a>install</h1>
+<p>With <a href="https://npmjs.org">npm</a> do:</p>
+<pre><code class="hljs">npm install tape --<span class="hljs-built_in">save</span>-<span class="hljs-built_in">dev</span>
+</code></pre>
+<h1><a id="license_378" class="dashAnchor" name="//apple_ref/Module/license"></a>license</h1>
+<p>MIT</p>
+
+                </body>
+            </html>
+        
+                </body>
+            </html>
+        
