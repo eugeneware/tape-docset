@@ -1,6 +1,6 @@
 title: Tape
 bundle_name: Tape
-keyword: tap
+keyword: tape
 files: ["index.md", "../github.css"]
 index_file: "index.md"
 stylesheet: github.css

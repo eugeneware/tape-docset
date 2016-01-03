@@ -15,8 +15,8 @@
     <key>dashIndexFilePath</key>
     <string>output/Tape.docset/Contents/Resources/Documents/index.html</string>
     <key>DashDocSetPluginKeyword</key>
-    <string>tap</string>
+    <string>tape</string>
     <key>DashDocSetKeyword</key>
-    <string>tap</string>
+    <string>tape</string>
   </dict>
 </plist>

@@ -6,7 +6,7 @@ Dash Docset for [Tape](https://github.com/substack/tape)
 
 Just grab the latest release [here](https://raw.githubusercontent.com/eugeneware/tape-docset/master/output/Tape.docset.zip)
 and unzip it then double click the unzipped `Tape.docset` to install it
-into dash. The search keyword is `expect:`.
+into dash. The search keyword is `tape:`.
 
 # Build Instructions
 
